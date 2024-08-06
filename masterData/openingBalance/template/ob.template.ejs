@@ -1,0 +1,187 @@
+<html>
+  <head>
+    <style type="text/css">
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 14px;
+      }
+      table {
+        font-size: 14px;
+        width: 100%;
+        border-collapse: collapse;
+      }
+      thead tr th {
+        color: royalblue;
+        /* border: .5px solid black; */
+      }
+      thead tr th:first-child {
+        border-left: none;
+      }
+      thead tr th:last-child {
+        border-right: none;
+      }
+      tbody tr td:first-child {
+        border-left: none;
+      }
+      tbody tr td:last-child {
+        border-right: none;
+      }
+      tr.tfoot td.border-tb {
+        padding: 0;
+        padding-left: 5px;
+      }
+      tr.tfoot td.border-tb span {
+        padding-top: 5px;
+        border-top: 0.5px solid black;
+        border-bottom: 0.5px solid black;
+      }
+
+      tr td,
+      tr th {
+        padding: 5px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 1em;
+      }
+      .footer {
+        position: relative;
+        padding: 1em;
+        border-top: 0.5px solid lightslategray;
+      }
+      .footer-page {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+      }
+
+      /* Text Modifier */
+      .text--title {
+        font-size: 24px;
+        margin: 0 0 5px;
+      }
+      .text--title.sub {
+        font-size: 18px;
+      }
+      .text--light {
+        font-weight: 400;
+      }
+      .text--bold {
+        font-weight: 600;
+      }
+      .text--subject {
+        font-family: "Times New Roman", Times, serif;
+      }
+      .text--red {
+        color: crimson;
+      }
+      .text--big {
+        font-size: 16px;
+      }
+      table tr .border {
+        border: 1px solid black;
+      }
+      table tr .hidden--top--border {
+        border: 1px solid black;
+        border-top: 0;
+      }
+      table tr .hidden--bottom--border {
+        border: 1px solid black;
+        border-bottom: 0;
+      }
+      table tr .bottom--border {
+        /* border: 1px solid black; */
+        border-bottom: 1px solid black;
+      }
+      table tr .top--border {
+        /* border: 1px solid black; */
+        border-top: 1px solid black;
+      }
+
+      
+      /* table tr {
+      border-bottom: 1px solid black;
+    } */
+    </style>
+  </head>
+  <body>
+    <!-- <div>
+      <p> date.to %></p>
+    </div>
+
+    <div class="header">
+      <h1 class="text--title text--light"> company %></h1>
+      <h1 class="text--title text--subject text--red">
+        General Ledger Summary
+      </h1>
+      <h3 class="text--title text--bold sub">From  date.from %> To  date.to %></h3>
+    </div> -->
+    <%
+    function rupiahFormat(value) {
+      let changeValue = Math.abs(value)
+      
+        var totalValue = changeValue
+        var koma = totalValue.toFixed(2);
+        var number_string = koma.toString()
+        var split = number_string.split('.')
+        var sisa = split[0].length % 3
+        var rupiahValue = split[0].substr(0, sisa);
+        var ribuan = split[0].substr(sisa).match(/\d{1,3}/gi);
+        if (ribuan) {
+          separator = sisa ? '.' : '';
+          rupiahValue += separator + ribuan.join('.');
+        }
+
+        
+        if(value < 0){
+          return split[1] != undefined ? "-" + rupiahValue + ',' + split[1] : rupiahValue;
+        } else {
+          return split[1] != undefined ? rupiahValue + ',' + split[1] : rupiahValue;
+        }
+      }
+    %>
+    <table>
+      <thead>
+        <tr>
+          <th class="border" style="width: 40%" align="left">Description</th>
+          <th class="border" style="width: 20%" align="right">Balance</th>
+          <th class="border" style="width: 20%" colspan="2"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% list.forEach(i => { %>
+        <tr>
+          <td align="left" style="width: 40%">
+            <span
+            class="text--bold"
+              ><%= i.acctype.acctype %>
+            </span>
+          </td>
+        </tr>
+        <% i.acct.forEach(e => { %>
+          <tr>
+            <td align="left" style="width: 40%;">
+              <span
+                class="<%= !e.isChild && 'text--bold' %>"
+                style="padding-left: 10px;margin-left: <%= e.depth * 10 %>px"
+                ><%= e.acctName %>
+              </span>
+            </td>
+            <% if (e.balance !== undefined) { %>
+              <td align="right" style="width: 20%"><%= rupiahFormat(e.balance) %></td>
+              <% } else { %>
+              <td align="right" style="width: 20%"></td>
+              <% } %>
+              <% if (e.total !== undefined) { %>
+              <td align="right" style="width: 20%" class="top--border"><%= rupiahFormat(e.total) %></td>
+              <td align="right" style="width: 20%"></td>
+              <% } %>
+          </tr>
+          <% }) %>
+        <% }); %>
+      </tbody>
+    </table>
+  </body>
+</html>
